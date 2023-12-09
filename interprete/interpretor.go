@@ -35,7 +35,7 @@ func NewInterpretor(data httpclient.GameData) Interpretor {
 	}
 }
 
-func (i Interpretor) Interprete() []Solution {
+func (i Interpretor) Interprete() ([]Solution, error) {
 	i.gridInRow = Grid(i.Data.Grid)
 	i.gridInColumn = Grid(i.Data.Grid).Reverse()
 
@@ -82,12 +82,11 @@ func (i Interpretor) Interprete() []Solution {
 				i.SetNextSolutionFromRow(row+1, column)
 			case "z":
 			default:
-				fmt.Printf("ERROR for command %v\n", command)
-
+				return nil, fmt.Errorf("unknown command : %s", command)
 			}
 		}
 	}
-	return *i.solutions
+	return *i.solutions, nil
 }
 
 func (i Interpretor) SetNextSolutionFromColumn(row, column int) {

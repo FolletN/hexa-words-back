@@ -82,6 +82,7 @@ func ParseGameData(ctx context.Context, body []byte) (GameData, error) {
 				definition := strings.Join(definitionWords, " ")
 				definition = strings.ReplaceAll(definition, "- ", "")
 				definition = strings.ReplaceAll(definition, "– ", "")
+				definition = strings.ReplaceAll(definition, "%", "")
 
 				definitions = append(definitions, definition)
 

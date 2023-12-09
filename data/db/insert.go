@@ -28,11 +28,6 @@ type WordDefinition struct {
 	Char13     string `pg:"13"`
 	Char14     string `pg:"14"`
 	Char15     string `pg:"15"`
-	Char16     string `pg:"16"`
-	Char17     string `pg:"17"`
-	Char18     string `pg:"18"`
-	Char19     string `pg:"19"`
-	Char20     string `pg:"20"`
 }
 
 const (
@@ -41,7 +36,7 @@ const (
 	password = "crossword"
 )
 
-func NewDBConn() *pg.DB {
+func NewDB() DBHandler {
 	address := fmt.Sprintf("%s:%s", "localhost", "5432")
 	options := &pg.Options{
 		User:     user,
@@ -50,19 +45,20 @@ func NewDBConn() *pg.DB {
 		Database: database,
 	}
 
-	return pg.Connect(options)
+	DB := pg.Connect(options)
+	return DBHandler{
+		DB: DB,
+	}
 }
 
-func createWordDefinitionSchema() error {
-	return DB.Model((*WordDefinition)(nil)).CreateTable(&orm.CreateTableOptions{
+func (db DBHandler) createWordDefinitionSchema() error {
+	return db.DB.Model((*WordDefinition)(nil)).CreateTable(&orm.CreateTableOptions{
 		IfNotExists: true,
 	})
 }
 
-var DB = NewDBConn()
-
-func InsertWordDefinition(solution interprete.Solution) error {
-	err := createWordDefinitionSchema()
+func (db DBHandler) InsertWordDefinition(solution interprete.Solution) error {
+	err := db.createWordDefinitionSchema()
 	if err != nil {
 		return err
 	}
@@ -118,25 +114,11 @@ func InsertWordDefinition(solution interprete.Solution) error {
 	if len(solution.Word) >= 15 {
 		wordDefinition.Char15 = string(solution.Word[14])
 	}
+
 	if len(solution.Word) >= 16 {
-		wordDefinition.Char16 = string(solution.Word[15])
-	}
-	if len(solution.Word) >= 17 {
-		wordDefinition.Char17 = string(solution.Word[16])
-	}
-	if len(solution.Word) >= 18 {
-		wordDefinition.Char18 = string(solution.Word[17])
-	}
-	if len(solution.Word) >= 19 {
-		wordDefinition.Char19 = string(solution.Word[18])
-	}
-	if len(solution.Word) >= 20 {
-		wordDefinition.Char20 = string(solution.Word[19])
-	}
-	if len(solution.Word) >= 21 {
-		fmt.Printf("ERROR: word longer than 20 characters\n")
+		fmt.Printf("ERROR: word longer than 16 characters\n")
 	}
 
-	_, err = DB.Model(wordDefinition).OnConflict("(definition, word, strength) DO NOTHING").Insert()
+	_, err = db.DB.Model(wordDefinition).OnConflict("(definition, word, strength) DO NOTHING").Insert()
 	return err
 }
