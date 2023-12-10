@@ -1,4 +1,4 @@
-module cross-words-harverter
+module cross-words
 
 go 1.21.4
 

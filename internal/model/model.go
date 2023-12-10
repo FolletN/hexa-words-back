@@ -1,8 +1,8 @@
-package data
+package model
 
 import (
 	"context"
-	"cross-words-harverter/interprete"
+	"cross-words/internal/controler/interprete"
 )
 
 type Data interface {

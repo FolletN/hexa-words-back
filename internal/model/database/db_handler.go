@@ -1,8 +1,8 @@
-package db
+package database
 
 import (
 	"context"
-	"cross-words-harverter/interprete"
+	"cross-words/internal/controler/interprete"
 	"fmt"
 
 	"github.com/go-pg/pg/v10"

@@ -1,4 +1,4 @@
-package httpclient
+package vingt_minutes
 
 import (
 	"context"

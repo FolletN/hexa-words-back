@@ -2,15 +2,15 @@ package handler
 
 import (
 	"context"
-	"cross-words-harverter/data"
-	"cross-words-harverter/httpclient"
-	"cross-words-harverter/interprete"
+	"cross-words/external/vingt_minutes"
+	"cross-words/internal/controler/interprete"
+	"cross-words/internal/model"
 	"fmt"
 	"time"
 )
 
 type Handler struct {
-	DataHandler data.Data
+	DataHandler model.Data
 }
 
 func (h Handler) Handle(ctx context.Context) error {
@@ -41,7 +41,7 @@ func getSolutions(ctx context.Context, formatedDate string) ([]interprete.Soluti
 
 	fmt.Printf("Processing date %v\n", formatedDate)
 
-	data, err := httpclient.GetData(ctx, formatedDate)
+	data, err := vingt_minutes.GetData(ctx, formatedDate)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve http data")
 	}

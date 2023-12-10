@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"cross-words-harverter/data/db"
-	"cross-words-harverter/handler"
+	"cross-words/internal/db"
+	"cross-words/internal/helper/handler"
 )
 
 func main() {

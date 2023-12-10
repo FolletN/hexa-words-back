@@ -1,7 +1,7 @@
 package interprete
 
 import (
-	"cross-words-harverter/httpclient"
+	"cross-words/external/vingt_minutes"
 	"fmt"
 )
 
@@ -16,7 +16,7 @@ func (s Solution) String() string {
 }
 
 type Interpretor struct {
-	Data httpclient.GameData
+	Data vingt_minutes.GameData
 
 	gridInRow    Grid
 	gridInColumn Grid
@@ -29,7 +29,7 @@ type Interpretor struct {
 	solutions     *[]Solution
 }
 
-func NewInterpretor(data httpclient.GameData) Interpretor {
+func NewInterpretor(data vingt_minutes.GameData) Interpretor {
 	return Interpretor{
 		Data: data,
 	}
