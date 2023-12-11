@@ -16,15 +16,19 @@ func (d DefinitionController) HarvestDefinitionsBetweenDates(ctx context.Context
 	date := startDate
 
 	var g errgroup.Group
-	definitionsChan := make(chan []definition_collector.Definition, 10)
+	definitionsChan := make(chan []definition_collector.Definition, 100)
 	defer close(definitionsChan)
-	go d.StoreDefinitions(ctx, definitionsChan)
+
+	endSendingDefinitions := make(chan any, 1)
+	defer close(endSendingDefinitions)
+
+	go d.StoreDefinitions(ctx, definitionsChan, endSendingDefinitions)
 
 	iterator := 0
 	for date.AddDate(0, 0, iterator).Before(endDate) {
-		go func(copiedDate time.Time) {
+		go func(dateCopy time.Time) {
 			g.Go(func() error {
-				return d.HarvestDefinitionsDate(ctx, copiedDate, definitionsChan)
+				return d.HarvestDefinitionsDate(ctx, dateCopy, definitionsChan)
 			})
 		}(date.AddDate(0, 0, iterator))
 		iterator++
@@ -33,6 +37,8 @@ func (d DefinitionController) HarvestDefinitionsBetweenDates(ctx context.Context
 	if err := g.Wait(); err != nil {
 		log.Fatal(err)
 	}
+
+	<-endSendingDefinitions
 
 	return nil
 }
@@ -46,11 +52,15 @@ func (d DefinitionController) HarvestDefinitionsDate(ctx context.Context, date t
 	return nil
 }
 
-func (d DefinitionController) StoreDefinitions(ctx context.Context, definitionsChan chan []definition_collector.Definition) error {
+func (d DefinitionController) StoreDefinitions(ctx context.Context, definitionsChan chan []definition_collector.Definition, endSendingDefeiition chan any) error {
 	for {
-		definitions := <-definitionsChan
-		if err := d.DataHandler.StoreDefinitions(ctx, definitions); err != nil {
-			return fmt.Errorf("failed to store definitions : %s", err)
+		select {
+		case definitions := <-definitionsChan:
+			if err := d.DataHandler.StoreDefinitions(ctx, definitions); err != nil {
+				return fmt.Errorf("failed to store definitions : %s", err)
+			}
+		case <-endSendingDefeiition:
+			return nil
 		}
 	}
 }
