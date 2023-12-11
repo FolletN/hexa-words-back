@@ -13,24 +13,22 @@ import (
 
 func (d DefinitionController) HarvestDefinitionsBetweenDates(ctx context.Context, startDate time.Time, endDate time.Time) error {
 	fmt.Printf("harvesting dates [%s, %s]\n", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
-	date := startDate
 
 	var g errgroup.Group
 	definitionsChan := make(chan []definition_collector.Definition, 100)
 	defer close(definitionsChan)
-
 	endSendingDefinitions := make(chan any, 1)
 	defer close(endSendingDefinitions)
 
 	go d.StoreDefinitions(ctx, definitionsChan, endSendingDefinitions)
 
 	iterator := 0
-	for date.AddDate(0, 0, iterator).Before(endDate) {
+	for harvestingDate := startDate; harvestingDate.Before(endDate); harvestingDate = harvestingDate.AddDate(0, 0, iterator) {
 		go func(dateCopy time.Time) {
 			g.Go(func() error {
 				return d.HarvestDefinitionsDate(ctx, dateCopy, definitionsChan)
 			})
-		}(date.AddDate(0, 0, iterator))
+		}(harvestingDate)
 		iterator++
 	}
 
