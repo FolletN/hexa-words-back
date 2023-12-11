@@ -5,6 +5,11 @@ go 1.21.4
 require github.com/go-pg/pg/v10 v10.11.2
 
 require (
+	github.com/gorilla/mux v1.8.1
+	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
+)
+
+require (
 	github.com/go-pg/zerochecker v0.2.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect

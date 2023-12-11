@@ -2,9 +2,10 @@ package model
 
 import (
 	"context"
-	"cross-words/internal/controler/interprete"
+
+	"cross-words/internal/controller/definition_collector"
 )
 
 type Data interface {
-	StoreSolutions(ctx context.Context, solutions []interprete.Solution) error
+	StoreDefinitions(ctx context.Context, solutions []definition_collector.Definition) error
 }

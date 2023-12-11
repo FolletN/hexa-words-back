@@ -29,7 +29,7 @@ var (
 	endOfListRegex            = regexp.MustCompile(`^](?:,)?$`)
 )
 
-func GetData(ctx context.Context, id string) (GameData, error) {
+func GetGameData(ctx context.Context, id string) (GameData, error) {
 	resp, err := http.Get(fmt.Sprintf("https://www.rcijeux.fr/drupal_game/20minutes/grids/%s.mfj", id))
 	if err != nil {
 		return GameData{}, err
