@@ -1,0 +1,42 @@
+services:
+  api:
+    container_name: hexacrosswords-api
+    build: .
+    environment:
+      - SERVER_PORT=${SERVER_PORT}
+      - DATABASE_DATABASE=${DB_NAME}
+      - DATABASE_USER=${DB_USER}
+      - DATABASE_PASSWORD=${DB_PASSWORD}
+      - DATABASE_ADDRESS=hexacrosswords-db-pg
+      - DATABASE_PORT=${DB_PORT}
+    ports:
+      - 8080:${SERVER_PORT}
+    restart: on-failure
+    depends_on:
+      - postgres
+    networks:
+      - fullstack
+
+  postgres:
+    image: postgres:latest
+    container_name: hexacrosswords-db-pg
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=hexacrosswords-db-pg
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - database_postgres:/var/lib/postgresql/data
+    networks:
+      - fullstack
+
+volumes:
+  api:
+  database_postgres:
+    # Uncomment this when using postgres.
+
+networks:
+  fullstack:
+    driver: bridge
