@@ -8,29 +8,41 @@ import (
 )
 
 const (
-	QueryParameterWidthKey  = "width"
-	QueryParameterHeightKey = "height"
-	defaultWidth            = 12
-	defaultHeight           = 20
-	minDimension            = 2
-	maxDimension            = 50
+	QueryParameterWidthKey    = "width"
+	QueryParameterHeightKey   = "height"
+	QueryParameterStrengthKey = "strength"
+	defaultWidth              = 12
+	defaultHeight             = 20
+	minDimension              = 2
+	maxDimension              = 50
 )
 
 func (s Server) HandleGetCrosswordGrid(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Received /crossword/grid command")
 
+	query := r.URL.Query()
 	width, height, err := getGridDimensions(
-		r.URL.Query().Get(QueryParameterWidthKey),
-		r.URL.Query().Get(QueryParameterHeightKey),
+		query.Get(QueryParameterWidthKey),
+		query.Get(QueryParameterHeightKey),
 	)
 	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
 
-	grid, err := s.crosswordGenerator.GenerateGrid(width, height)
+	strength, err := getGridStrength(
+		query.Get(QueryParameterStrengthKey),
+	)
 	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	grid, err := s.crosswordGenerator.GenerateGrid(r.Context(), strength, width, height)
+	if err != nil {
+		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	json.NewEncoder(w).Encode(grid)
@@ -62,4 +74,20 @@ func getGridDimensions(widthStr, heightStr string) (int, int, error) {
 	}
 
 	return width, height, nil
+}
+
+func getGridStrength(strengthStr string) (int, error) {
+	strength := 2
+	if strengthStr != "" {
+		var err error
+		strength, err = strconv.Atoi(strengthStr)
+		if err != nil {
+			return 0, fmt.Errorf("failed to parse strength : %w", err)
+		}
+	}
+
+	if strength > 4 || strength < 1 {
+		return 0, fmt.Errorf("strength out or range : %v", strength)
+	}
+	return strength, nil
 }

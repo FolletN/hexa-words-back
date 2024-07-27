@@ -128,8 +128,115 @@ func storeDefinition(ctx context.Context, db bun.IDB, definitions Definition) er
 }
 
 type SearchDefinitionParameters struct {
+	Strength    *int
+	MaxStrength *int
+	MinStrength *int
+	Length      *int
+	MaxLength   *int
+	MinLength   *int
+	OrderBy     []string
+	OrderExpr   *string
+	Char1       *string
+	Char2       *string
+	Char3       *string
+	Char4       *string
+	Char5       *string
+	Char6       *string
+	Char7       *string
+	Char8       *string
+	Char9       *string
+	Char10      *string
+	Char11      *string
+	Char12      *string
+	Char13      *string
+	Char14      *string
+	Char15      *string
 }
 
-func (db DefinitionHandler) SearchDefinition(ctx context.Context, searchParameters SearchDefinitionParameters) ([]Definition, error) {
-	return nil, nil
+func (db DefinitionHandler) SearchDefinition(ctx context.Context, searchParameters SearchDefinitionParameters) (Definition, error) {
+	definition := dbDefinition{}
+	query := db.DB.NewSelect().Model(&definition)
+
+	if searchParameters.Strength != nil {
+		query.Where("strength = ?", searchParameters.Strength)
+	}
+	if searchParameters.MinStrength != nil {
+		query.Where("strength >= ?", searchParameters.MinStrength)
+	}
+	if searchParameters.MaxStrength != nil {
+		query.Where("strength <= ?", searchParameters.MaxStrength)
+	}
+	if searchParameters.Length != nil {
+		query.Where("length = ?", searchParameters.Strength)
+	}
+	if searchParameters.MinLength != nil {
+		query.Where("length >= ?", searchParameters.MinLength)
+	}
+	if searchParameters.MaxLength != nil {
+		query.Where("length <= ?", searchParameters.MaxLength)
+	}
+	if searchParameters.Char1 != nil {
+		query.Where("1 = ?", searchParameters.Char1)
+	}
+	if searchParameters.Char2 != nil {
+		query.Where("2 = ?", searchParameters.Char2)
+	}
+	if searchParameters.Char3 != nil {
+		query.Where("3 = ?", searchParameters.Char3)
+	}
+	if searchParameters.Char4 != nil {
+		query.Where("4 = ?", searchParameters.Char4)
+	}
+	if searchParameters.Char5 != nil {
+		query.Where("5 = ?", searchParameters.Char5)
+	}
+	if searchParameters.Char6 != nil {
+		query.Where("6 = ?", searchParameters.Char6)
+	}
+	if searchParameters.Char7 != nil {
+		query.Where("7 = ?", searchParameters.Char7)
+	}
+	if searchParameters.Char8 != nil {
+		query.Where("8 = ?", searchParameters.Char8)
+	}
+	if searchParameters.Char9 != nil {
+		query.Where("9 = ?", searchParameters.Char9)
+	}
+	if searchParameters.Char10 != nil {
+		query.Where("10 = ?", searchParameters.Char10)
+	}
+	if searchParameters.Char11 != nil {
+		query.Where("11 = ?", searchParameters.Char11)
+	}
+	if searchParameters.Char12 != nil {
+		query.Where("12 = ?", searchParameters.Char12)
+	}
+	if searchParameters.Char13 != nil {
+		query.Where("13 = ?", searchParameters.Char13)
+	}
+	if searchParameters.Char14 != nil {
+		query.Where("14 = ?", searchParameters.Char14)
+	}
+	if searchParameters.Char15 != nil {
+		query.Where("15 = ?", searchParameters.Char15)
+	}
+	if searchParameters.OrderBy != nil {
+		query.Order(searchParameters.OrderBy...)
+	}
+	if searchParameters.OrderBy != nil {
+		query.OrderExpr(*searchParameters.OrderExpr)
+	}
+
+	fmt.Println(query.String())
+
+	err := query.Scan(ctx)
+	if err != nil {
+		return Definition{}, err
+	}
+
+	return Definition{
+		Statement: definition.Statement,
+		Word:      definition.Word,
+		Strength:  definition.Strength,
+	}, nil
 }
